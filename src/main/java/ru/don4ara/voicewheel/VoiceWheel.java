@@ -42,10 +42,10 @@ public class VoiceWheel implements ClientModInitializer {
         if (client.mouseHandler.isRightPressed() && client.crosshairPickEntity instanceof AbstractClientPlayer target) {
             PlayerState state = ClientManager.getPlayerStateManager().getState(target.getUUID());
             if (state != null) {
-                double prevVolume = VoicechatClient.PLAYER_VOLUME_CONFIG.getVolume(state.getUuid());
+                double prevVolume = VoicechatClient.VOLUME_CONFIG.getPlayerVolume(state.getUuid());
                 double newVolume = Mth.clamp(prevVolume + (prevVolume >= 1.0 ? 0.1 : 0.05) * (vector.y == 0 ? -vector.x : vector.y), 0.0, 4.0);
-                VoicechatClient.PLAYER_VOLUME_CONFIG.setVolume(state.getUuid(), newVolume);
-                VoicechatClient.PLAYER_VOLUME_CONFIG.save();
+                VoicechatClient.VOLUME_CONFIG.setPlayerVolume(state.getUuid(), newVolume);
+                VoicechatClient.VOLUME_CONFIG.save();
                 int percent = (int) Math.round(100.0 * (newVolume - 1.0));
                 VOLUME_MESSAGES.put(target.getUUID(), new VolumeMessage(
                         Component.literal((percent >= 0 ? "+" + percent : String.valueOf(percent)) + "%"),
