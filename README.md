@@ -42,7 +42,8 @@ The indicator displays the difference from the default volume:
 | 26.1, 26.1.1, 26.1.2 | ✅ | ✅ | ✅ | 25+ |
 | 1.21.11 | ✅ | ✅ | ✅ | 21+ |
 | 1.21.10 | ✅ | — | — | 21+ |
-| 1.21.1–1.21.9 | ✅ | — | ✅ | 21+ |
+| 1.21.1, 1.21.3–1.21.9 | ✅ | ✅ | ✅ | 21+ |
+| 1.21.2 | ✅ | — | ✅ | 21+ |
 
 Every build requires Simple Voice Chat and the matching mod loader. Fabric
 builds also require Fabric API.
