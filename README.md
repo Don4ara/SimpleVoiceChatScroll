@@ -85,9 +85,9 @@ Release tags combine the mod and Minecraft versions, for example
 
 Release assets identify the loader explicitly, for example:
 
-- `voicewheel-0.0.1+mc26.2-fabric.jar`
-- `voicewheel-0.0.1+mc26.2-forge.jar`
-- `voicewheel-0.0.1+mc26.2-neoforge.jar`
+- `SimpleVoiceChatScroll-0.0.1+mc26.2-fabric.jar`
+- `SimpleVoiceChatScroll-0.0.1+mc26.2-forge.jar`
+- `SimpleVoiceChatScroll-0.0.1+mc26.2-neoforge.jar`
 
 Update `mod_version` before publishing a new version. Pushing an explicit tag
 starting with `v` is also supported.
