@@ -15,6 +15,9 @@ without opening a menu.
 - Install the mod only on the client; servers do not need SimpleVoiceChatScroll.
 - Choose Fabric, Forge, or NeoForge on supported versions.
 
+> **The volume indicator still works when player name tags are disabled or
+> hidden.**
+
 ## Usage
 
 1. Point the crosshair at a player connected to Simple Voice Chat.
@@ -36,8 +39,9 @@ The indicator displays the difference from the default volume:
 | Minecraft | Fabric | Forge | NeoForge | Java |
 |---|---|---|---|---|
 | 26.2 | ✅ | ✅ | ✅ | 25+ |
-| 26.1, 26.1.1, 26.1.2 | ✅ | — | — | 25+ |
-| 1.21.1–1.21.11 | ✅ | — | — | 21+ |
+| 26.1, 26.1.1, 26.1.2 | ✅ | ✅ | ✅ | 25+ |
+| 1.21.11 | ✅ | ✅ | ✅ | 21+ |
+| 1.21.1–1.21.10 | ✅ | — | — | 21+ |
 
 Every build requires Simple Voice Chat and the matching mod loader. Fabric
 builds also require Fabric API.
@@ -78,6 +82,12 @@ Every push to `main`, `fabric/<version>`, `forge/<version>`, or
 release. Loader builds share the same release and use distinct filenames.
 Release tags combine the mod and Minecraft versions, for example
 `v0.0.1-mc26.2`.
+
+Release assets identify the loader explicitly, for example:
+
+- `voicewheel-0.0.1+mc26.2-fabric.jar`
+- `voicewheel-0.0.1+mc26.2-forge.jar`
+- `voicewheel-0.0.1+mc26.2-neoforge.jar`
 
 Update `mod_version` before publishing a new version. Pushing an explicit tag
 starting with `v` is also supported.
