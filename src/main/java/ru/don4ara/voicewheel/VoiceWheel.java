@@ -74,7 +74,7 @@ public class VoiceWheel implements ClientModInitializer {
             return;
         }
 
-        float tickDelta = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickDelta = context.tickCounter().getGameTimeDeltaPartialTick(false);
         Vec3 localPosition = localPlayer.getPosition(tickDelta);
         double maxDistanceSquared = RENDER_DISTANCE * RENDER_DISTANCE;
         for (AbstractClientPlayer player : level.players()) {
