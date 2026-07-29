@@ -5,13 +5,12 @@ import de.maxhenkel.voicechat.VoicechatClient;
 import de.maxhenkel.voicechat.voice.client.ClientManager;
 import de.maxhenkel.voicechat.voice.common.PlayerState;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.scores.PlayerTeam;
@@ -34,7 +33,6 @@ public class VoiceWheel implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        WorldRenderEvents.END_MAIN.register(VoiceWheel::renderVolumeIndicators);
     }
 
     public static boolean handleScroll(Vector2i vector) {
@@ -57,11 +55,15 @@ public class VoiceWheel implements ClientModInitializer {
         return false;
     }
 
-    private static void renderVolumeIndicators(WorldRenderContext context) {
+    public static void renderVolumeIndicators(
+            PoseStack poses,
+            LevelRenderState levelRenderState,
+            SubmitNodeCollector collector
+    ) {
         Minecraft client = Minecraft.getInstance();
         ClientLevel level = client.level;
         AbstractClientPlayer localPlayer = client.player;
-        Vec3 cameraPos = context.worldState().cameraRenderState.pos;
+        Vec3 cameraPos = levelRenderState.cameraRenderState.pos;
         if (level == null || localPlayer == null || cameraPos == null) {
             VOLUME_MESSAGES.clear();
             return;
@@ -94,7 +96,9 @@ public class VoiceWheel implements ClientModInitializer {
                     : (MESSAGE_DURATION_MILLIS - elapsed) / (float) FADE_DURATION_MILLIS;
             boolean nameTagVisible = isNameTagVisible(player, localPlayer);
             submitText(
-                    context,
+                    poses,
+                    levelRenderState,
+                    collector,
                     cameraPos,
                     position,
                     player.getBbHeight(),
@@ -131,16 +135,17 @@ public class VoiceWheel implements ClientModInitializer {
     }
 
     private static void submitText(
-            WorldRenderContext context,
+            PoseStack poses,
+            LevelRenderState levelRenderState,
+            SubmitNodeCollector collector,
             Vec3 cameraPos,
             Vec3 playerPosition,
             float playerHeight,
             boolean nameTagVisible,
             Component text,
-            float opacity
+        float opacity
     ) {
         Minecraft client = Minecraft.getInstance();
-        PoseStack poses = context.matrices();
         poses.pushPose();
         double heightOffset = nameTagVisible ? 0.85D : 0.5D;
         poses.translate(
@@ -148,13 +153,12 @@ public class VoiceWheel implements ClientModInitializer {
                 playerPosition.y + playerHeight + heightOffset - cameraPos.y,
                 playerPosition.z - cameraPos.z
         );
-        poses.mulPose(context.worldState().cameraRenderState.orientation);
+        poses.mulPose(levelRenderState.cameraRenderState.orientation);
         poses.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
 
         int textAlpha = Math.round(255.0F * opacity);
         int backgroundAlpha = Math.round(96.0F * opacity);
         float x = -client.font.width(text) / 2.0F;
-        SubmitNodeCollector collector = context.commandQueue();
         collector.submitText(
                 poses,
                 x,
