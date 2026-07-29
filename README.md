@@ -29,13 +29,16 @@ The indicator displays the difference from the default volume:
 - `+100%` means 200% volume.
 - `-100%` means the player is muted.
 
-## Requirements
+## Compatibility
 
-- Minecraft 26.2
-- Fabric Loader 0.19.3 or newer
-- Fabric API
-- Simple Voice Chat
-- Java 25 or newer
+| Minecraft | Branch | Java |
+|---|---|---|
+| 26.2 | `main`, `fabric/26.2` | 25+ |
+| 26.1, 26.1.1, 26.1.2 | `fabric/<version>` | 25+ |
+| 1.21.1–1.21.11 | `fabric/<version>` | 21+ |
+
+Each build requires Fabric Loader, Fabric API, and Simple Voice Chat for the
+matching Minecraft version.
 
 ## Installation
 
@@ -68,9 +71,9 @@ commit message.
 
 ## Releases
 
-Every push to `main` publishes the compiled JAR to a GitHub release. The
-release tag is generated from `mod_version` in `gradle.properties`, for example
-`v0.0.1`.
+Every push to `main` or a `fabric/<version>` branch publishes the compiled JAR
+to a version-specific GitHub release. Release tags combine the mod and
+Minecraft versions, for example `v0.0.1-mc26.2`.
 
 Update `mod_version` before publishing a new version. Pushing an explicit tag
 starting with `v` is also supported.

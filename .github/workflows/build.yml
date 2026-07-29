@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - "fabric/**"
     tags:
       - "v*"
     paths-ignore:
@@ -28,11 +29,29 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Set up Java 25
+      - name: Read project metadata
+        id: project
+        shell: bash
+        run: |
+          minecraft="$(sed -n 's/^minecraft_version=//p' gradle.properties)"
+          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
+          java="$(sed -n 's/^java_version=//p' gradle.properties)"
+          test -n "$minecraft" && test -n "$version" && test -n "$java"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            tag="${GITHUB_REF#refs/tags/}"
+          else
+            tag="v${version}-mc${minecraft}"
+          fi
+          echo "minecraft=$minecraft" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "java=$java" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "25"
+          java-version: ${{ steps.project.outputs.java }}
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -42,20 +61,6 @@ jobs:
 
       - name: Build
         run: ./gradlew build --no-daemon
-
-      - name: Resolve release tag
-        if: github.event_name != 'pull_request'
-        id: release
-        shell: bash
-        run: |
-          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            tag="${GITHUB_REF#refs/tags/}"
-          else
-            version="$(sed -n 's/^mod_version=//p' gradle.properties)"
-            test -n "$version"
-            tag="v$version"
-          fi
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: Prepare release asset
         if: github.event_name != 'pull_request'
@@ -67,9 +72,11 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ steps.release.outputs.tag }}
+          tag_name: ${{ steps.project.outputs.tag }}
           target_commitish: ${{ github.sha }}
+          name: VoiceWheel ${{ steps.project.outputs.version }} for Minecraft ${{ steps.project.outputs.minecraft }}
           files: build/release/*.jar
           generate_release_notes: true
           fail_on_unmatched_files: true
           overwrite_files: true
+          make_latest: ${{ github.ref == 'refs/heads/main' }}
