@@ -5,8 +5,8 @@ import de.maxhenkel.voicechat.VoicechatClient;
 import de.maxhenkel.voicechat.voice.client.ClientManager;
 import de.maxhenkel.voicechat.voice.common.PlayerState;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -34,7 +34,7 @@ public class VoiceWheel implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES.register(VoiceWheel::renderVolumeIndicators);
+        WorldRenderEvents.END_MAIN.register(VoiceWheel::renderVolumeIndicators);
     }
 
     public static boolean handleScroll(Vector2i vector) {
@@ -57,11 +57,11 @@ public class VoiceWheel implements ClientModInitializer {
         return false;
     }
 
-    private static void renderVolumeIndicators(LevelRenderContext context) {
+    private static void renderVolumeIndicators(WorldRenderContext context) {
         Minecraft client = Minecraft.getInstance();
         ClientLevel level = client.level;
         AbstractClientPlayer localPlayer = client.player;
-        Vec3 cameraPos = context.levelState().cameraRenderState.pos;
+        Vec3 cameraPos = context.worldState().cameraRenderState.pos;
         if (level == null || localPlayer == null || cameraPos == null) {
             VOLUME_MESSAGES.clear();
             return;
@@ -131,7 +131,7 @@ public class VoiceWheel implements ClientModInitializer {
     }
 
     private static void submitText(
-            LevelRenderContext context,
+            WorldRenderContext context,
             Vec3 cameraPos,
             Vec3 playerPosition,
             float playerHeight,
@@ -140,7 +140,7 @@ public class VoiceWheel implements ClientModInitializer {
             float opacity
     ) {
         Minecraft client = Minecraft.getInstance();
-        PoseStack poses = context.poseStack();
+        PoseStack poses = context.matrices();
         poses.pushPose();
         double heightOffset = nameTagVisible ? 0.85D : 0.5D;
         poses.translate(
@@ -148,13 +148,13 @@ public class VoiceWheel implements ClientModInitializer {
                 playerPosition.y + playerHeight + heightOffset - cameraPos.y,
                 playerPosition.z - cameraPos.z
         );
-        poses.mulPose(context.levelState().cameraRenderState.orientation);
+        poses.mulPose(context.worldState().cameraRenderState.orientation);
         poses.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
 
         int textAlpha = Math.round(255.0F * opacity);
         int backgroundAlpha = Math.round(96.0F * opacity);
         float x = -client.font.width(text) / 2.0F;
-        SubmitNodeCollector collector = context.submitNodeCollector();
+        SubmitNodeCollector collector = context.commandQueue();
         collector.submitText(
                 poses,
                 x,
