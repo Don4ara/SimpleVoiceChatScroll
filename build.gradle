@@ -4,7 +4,7 @@ plugins {
     id "com.modrinth.minotaur" version "2.+"
 }
 
-version = "${project.mod_version}+mc${project.minecraft_version}"
+version = "${project.mod_version}+mc${project.minecraft_version}-fabric"
 group = project.maven_group
 
 base {

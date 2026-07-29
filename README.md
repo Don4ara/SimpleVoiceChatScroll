@@ -1,6 +1,6 @@
-# VoiceWheel
+# SimpleVoiceChatScroll
 
-VoiceWheel is a client-side Minecraft mod for Fabric, Forge, and NeoForge that
+SimpleVoiceChatScroll is a client-side Minecraft mod for Fabric, Forge, and NeoForge that
 lets you adjust the volume of individual
 [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) players
 without opening a menu.
@@ -12,7 +12,7 @@ without opening a menu.
 - Change the volume from 0% to 400%.
 - See the new volume above the targeted player for three seconds.
 - Keep individual player volumes saved through Simple Voice Chat.
-- Install the mod only on the client; servers do not need VoiceWheel.
+- Install the mod only on the client; servers do not need SimpleVoiceChatScroll.
 - Choose Fabric, Forge, or NeoForge on supported versions.
 
 ## Usage
@@ -46,8 +46,8 @@ builds also require Fabric API.
 
 1. Install Fabric Loader with Fabric API, Forge, or NeoForge.
 2. Install Simple Voice Chat for the same loader.
-3. Download the matching VoiceWheel JAR from
-   [GitHub Releases](https://github.com/Don4ara/VoiceWheel/releases) or
+3. Download the matching SimpleVoiceChatScroll JAR from
+   [GitHub Releases](https://github.com/Don4ara/SimpleVoiceChatScroll/releases) or
    [Modrinth](https://modrinth.com/mod/voicewheel).
 4. Place the downloaded JAR in the Minecraft `mods` directory.
 

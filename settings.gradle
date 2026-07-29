@@ -9,4 +9,4 @@ pluginManagement {
 	}
 }
 
-rootProject.name = 'VoiceWheel'
+rootProject.name = 'SimpleVoiceChatScroll'

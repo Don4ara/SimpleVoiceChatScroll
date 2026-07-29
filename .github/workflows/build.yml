@@ -1,4 +1,4 @@
-name: Build VoiceWheel
+name: Build SimpleVoiceChatScroll
 
 on:
   push:
@@ -76,7 +76,7 @@ jobs:
         with:
           tag_name: ${{ steps.project.outputs.tag }}
           target_commitish: ${{ github.sha }}
-          name: VoiceWheel ${{ steps.project.outputs.version }} for Minecraft ${{ steps.project.outputs.minecraft }}
+          name: SimpleVoiceChatScroll ${{ steps.project.outputs.version }} for Minecraft ${{ steps.project.outputs.minecraft }}
           files: build/release/*.jar
           generate_release_notes: true
           fail_on_unmatched_files: true

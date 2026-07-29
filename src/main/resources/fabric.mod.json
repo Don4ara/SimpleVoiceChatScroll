@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "voicewheel",
   "version": "${version}",
-  "name": "VoiceWheel",
+  "name": "SimpleVoiceChatScroll",
   "description": "Adjust Simple Voice Chat players volume with RMB + Mouse Wheel Scroll",
   "authors": [
     "don4ara"
