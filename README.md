@@ -62,6 +62,10 @@ On Windows:
 
 The compiled mod JAR is written to `build/libs`.
 
+Changes limited to CI configuration, documentation, or Markdown files do not
+trigger a build. To skip a build for another commit, include `[ci skip]` in its
+commit message.
+
 ## Releases
 
 Every push to `main` publishes the compiled JAR to a GitHub release. The
