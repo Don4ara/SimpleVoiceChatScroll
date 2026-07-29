@@ -5,12 +5,13 @@ import de.maxhenkel.voicechat.VoicechatClient;
 import de.maxhenkel.voicechat.voice.client.ClientManager;
 import de.maxhenkel.voicechat.voice.common.PlayerState;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.scores.PlayerTeam;
@@ -33,6 +34,7 @@ public class VoiceWheel implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        WorldRenderEvents.AFTER_ENTITIES.register(VoiceWheel::renderVolumeIndicators);
     }
 
     public static boolean handleScroll(Vector2i vector) {
@@ -55,15 +57,11 @@ public class VoiceWheel implements ClientModInitializer {
         return false;
     }
 
-    public static void renderVolumeIndicators(
-            PoseStack poses,
-            LevelRenderState levelRenderState,
-            SubmitNodeCollector collector
-    ) {
+    private static void renderVolumeIndicators(WorldRenderContext context) {
         Minecraft client = Minecraft.getInstance();
         ClientLevel level = client.level;
         AbstractClientPlayer localPlayer = client.player;
-        Vec3 cameraPos = levelRenderState.cameraRenderState.pos;
+        Vec3 cameraPos = context.camera().getPosition();
         if (level == null || localPlayer == null || cameraPos == null) {
             VOLUME_MESSAGES.clear();
             return;
@@ -96,9 +94,7 @@ public class VoiceWheel implements ClientModInitializer {
                     : (MESSAGE_DURATION_MILLIS - elapsed) / (float) FADE_DURATION_MILLIS;
             boolean nameTagVisible = isNameTagVisible(player, localPlayer);
             submitText(
-                    poses,
-                    levelRenderState,
-                    collector,
+                    context,
                     cameraPos,
                     position,
                     player.getBbHeight(),
@@ -135,9 +131,7 @@ public class VoiceWheel implements ClientModInitializer {
     }
 
     private static void submitText(
-            PoseStack poses,
-            LevelRenderState levelRenderState,
-            SubmitNodeCollector collector,
+            WorldRenderContext context,
             Vec3 cameraPos,
             Vec3 playerPosition,
             float playerHeight,
@@ -146,6 +140,11 @@ public class VoiceWheel implements ClientModInitializer {
         float opacity
     ) {
         Minecraft client = Minecraft.getInstance();
+        PoseStack poses = context.matrixStack();
+        MultiBufferSource consumers = context.consumers();
+        if (poses == null || consumers == null) {
+            return;
+        }
         poses.pushPose();
         double heightOffset = nameTagVisible ? 0.85D : 0.5D;
         poses.translate(
@@ -153,23 +152,23 @@ public class VoiceWheel implements ClientModInitializer {
                 playerPosition.y + playerHeight + heightOffset - cameraPos.y,
                 playerPosition.z - cameraPos.z
         );
-        poses.mulPose(levelRenderState.cameraRenderState.orientation);
+        poses.mulPose(context.camera().rotation());
         poses.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
 
         int textAlpha = Math.round(255.0F * opacity);
         int backgroundAlpha = Math.round(96.0F * opacity);
         float x = -client.font.width(text) / 2.0F;
-        collector.submitText(
-                poses,
+        client.font.drawInBatch(
+                text,
                 x,
                 0.0F,
-                text.getVisualOrderText(),
-                false,
-                Font.DisplayMode.SEE_THROUGH,
-                FULL_BRIGHT,
                 textAlpha << 24 | 0xFFFFFF,
+                false,
+                poses.last().pose(),
+                consumers,
+                Font.DisplayMode.SEE_THROUGH,
                 backgroundAlpha << 24,
-                0
+                FULL_BRIGHT
         );
         poses.popPose();
     }
