@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - "fabric/**"
+      - "forge/**"
+      - "neoforge/**"
     tags:
       - "v*"
     paths-ignore:

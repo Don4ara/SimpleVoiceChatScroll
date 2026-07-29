@@ -1,8 +1,9 @@
 # VoiceWheel
 
-VoiceWheel is a client-side Fabric mod that lets you adjust the volume of
-individual [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat)
-players without opening a menu.
+VoiceWheel is a client-side Minecraft mod for Fabric, Forge, and NeoForge that
+lets you adjust the volume of individual
+[Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) players
+without opening a menu.
 
 ## Features
 
@@ -12,6 +13,7 @@ players without opening a menu.
 - See the new volume above the targeted player for three seconds.
 - Keep individual player volumes saved through Simple Voice Chat.
 - Install the mod only on the client; servers do not need VoiceWheel.
+- Choose Fabric, Forge, or NeoForge on supported versions.
 
 ## Usage
 
@@ -31,20 +33,20 @@ The indicator displays the difference from the default volume:
 
 ## Compatibility
 
-| Minecraft | Branch | Java |
-|---|---|---|
-| 26.2 | `main`, `fabric/26.2` | 25+ |
-| 26.1, 26.1.1, 26.1.2 | `fabric/<version>` | 25+ |
-| 1.21.1–1.21.11 | `fabric/<version>` | 21+ |
+| Minecraft | Fabric | Forge | NeoForge | Java |
+|---|---|---|---|---|
+| 26.2 | ✅ | ✅ | ✅ | 25+ |
+| 26.1, 26.1.1, 26.1.2 | ✅ | — | — | 25+ |
+| 1.21.1–1.21.11 | ✅ | — | — | 21+ |
 
-Each build requires Fabric Loader, Fabric API, and Simple Voice Chat for the
-matching Minecraft version.
+Every build requires Simple Voice Chat and the matching mod loader. Fabric
+builds also require Fabric API.
 
 ## Installation
 
-1. Install Fabric Loader and Fabric API.
-2. Install Simple Voice Chat.
-3. Download VoiceWheel from
+1. Install Fabric Loader with Fabric API, Forge, or NeoForge.
+2. Install Simple Voice Chat for the same loader.
+3. Download the matching VoiceWheel JAR from
    [GitHub Releases](https://github.com/Don4ara/VoiceWheel/releases) or
    [Modrinth](https://modrinth.com/mod/voicewheel).
 4. Place the downloaded JAR in the Minecraft `mods` directory.
@@ -71,9 +73,11 @@ commit message.
 
 ## Releases
 
-Every push to `main` or a `fabric/<version>` branch publishes the compiled JAR
-to a version-specific GitHub release. Release tags combine the mod and
-Minecraft versions, for example `v0.0.1-mc26.2`.
+Every push to `main`, `fabric/<version>`, `forge/<version>`, or
+`neoforge/<version>` publishes the compiled JAR to a version-specific GitHub
+release. Loader builds share the same release and use distinct filenames.
+Release tags combine the mod and Minecraft versions, for example
+`v0.0.1-mc26.2`.
 
 Update `mod_version` before publishing a new version. Pushing an explicit tag
 starting with `v` is also supported.
