@@ -64,13 +64,12 @@ The compiled mod JAR is written to `build/libs`.
 
 ## Releases
 
-The GitHub Actions workflow publishes a release automatically when a tag
-starting with `v` is pushed:
+Every push to `main` publishes the compiled JAR to a GitHub release. The
+release tag is generated from `mod_version` in `gradle.properties`, for example
+`v0.0.1`.
 
-```shell
-git tag v0.0.1
-git push origin v0.0.1
-```
+Update `mod_version` before publishing a new version. Pushing an explicit tag
+starting with `v` is also supported.
 
 ## License
 
