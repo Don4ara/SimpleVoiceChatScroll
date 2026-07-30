@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "ru.don4ara.voicewheel.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
   ],
   "injectors": {
@@ -11,6 +11,7 @@
     "requireAnnotations": true
   },
   "client": [
+    "LevelRendererMixin",
     "MouseMixin"
   ]
 }
