@@ -1,16 +1,14 @@
 modLoader="javafml"
-loaderVersion="[3,)"
+loaderVersion="[1,)"
 license="All Rights Reserved"
+clientSideOnly=true
 
 [[mods]]
 modId="voicewheel"
 version="${version}"
 displayName="SimpleVoiceChatScroll"
 authors="don4ara"
-displayTest="IGNORE_ALL_VERSION"
-description='''
-Adjust Simple Voice Chat player volume with right mouse button + mouse wheel.
-'''
+description='''Adjust Simple Voice Chat player volume with the right mouse button and mouse wheel.'''
 
 [[dependencies.voicewheel]]
 modId="neoforge"
@@ -22,13 +20,13 @@ side="CLIENT"
 [[dependencies.voicewheel]]
 modId="minecraft"
 type="required"
-versionRange="[${minecraft_version},${minecraft_next_version})"
+versionRange="[${minecraft_version}]"
 ordering="NONE"
 side="CLIENT"
 
 [[dependencies.voicewheel]]
 modId="voicechat"
 type="required"
-versionRange="[2.6.21,)"
+versionRange="[2.6,)"
 ordering="AFTER"
 side="CLIENT"

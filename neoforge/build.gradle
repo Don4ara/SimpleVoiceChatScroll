@@ -29,26 +29,16 @@ dependencies {
     implementation "maven.modrinth:simple-voice-chat:${project.voicechat_neoforge_version}"
 }
 
-sourceSets {
-    main {
-        java.srcDir rootProject.file('common/src/main/java')
-        resources.srcDir rootProject.file('common/src/main/resources')
-        resources.srcDir rootProject.file('src/main/resources')
-    }
-}
-
 processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version
     inputs.property "neoforge_version", project.neoforge_version
-    exclude "fabric.mod.json", "voicewheel.mixins.json"
 
     filesMatching("META-INF/neoforge.mods.toml") {
         expand(
                 "version": inputs.properties.version,
                 "minecraft_version": inputs.properties.minecraft_version,
-                "neoforge_version": inputs.properties.neoforge_version,
-                "minecraft_next_version": "26.3"
+                "neoforge_version": inputs.properties.neoforge_version
         )
     }
 }
