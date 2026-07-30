@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.don4ara.voicewheel.VoiceWheel;
+import ru.don4ara.voicewheel.VoiceWheelFabric;
 
 @Mixin(MouseHandler.class)
 abstract class MouseMixin {
@@ -21,9 +21,8 @@ abstract class MouseMixin {
             cancellable = true
     )
     private void handleMouseScroll(CallbackInfo ci, @Local Vector2i vector) {
-        if (VoiceWheel.handleScroll(vector)) {
+        if (VoiceWheelFabric.handleScroll(vector)) {
             ci.cancel();
         }
     }
-
 }

@@ -1,0 +1,34 @@
+modLoader="javafml"
+loaderVersion="[24,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="voicewheel"
+version="${version}"
+displayName="SimpleVoiceChatScroll"
+authors="don4ara"
+displayTest="IGNORE_ALL_VERSION"
+description='''
+Adjust Simple Voice Chat player volume with right mouse button + mouse wheel.
+'''
+
+[[dependencies.voicewheel]]
+modId="forge"
+mandatory=true
+versionRange="[${forge_major},)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.voicewheel]]
+modId="minecraft"
+mandatory=true
+versionRange="[${minecraft_version},${minecraft_next_version})"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.voicewheel]]
+modId="voicechat"
+mandatory=true
+versionRange="[2.6.21,)"
+ordering="AFTER"
+side="CLIENT"

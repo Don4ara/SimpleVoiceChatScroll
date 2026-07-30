@@ -52,7 +52,7 @@ builds also require Fabric API.
 
 1. Install Fabric Loader with Fabric API, Forge, or NeoForge.
 2. Install Simple Voice Chat for the same loader.
-3. Download the matching SimpleVoiceChatScroll JAR from
+3. Download the universal SimpleVoiceChatScroll JAR for your Minecraft version from
    [GitHub Releases](https://github.com/Don4ara/SimpleVoiceChatScroll/releases) or
    [Modrinth](https://modrinth.com/mod/voicewheel).
 4. Place the downloaded JAR in the Minecraft `mods` directory.
@@ -80,16 +80,14 @@ commit message.
 ## Releases
 
 Every push to `main`, `fabric/<version>`, `forge/<version>`, or
-`neoforge/<version>` publishes the compiled JAR to a version-specific GitHub
-release. Loader builds share the same release and use distinct filenames.
+`neoforge/<version>` publishes the compiled JAR to a version-specific GitHub release.
+The current multiloader build packages the Fabric, Forge, and NeoForge entrypoints
+and metadata into one universal JAR.
+
 Release tags combine the mod and Minecraft versions, for example
-`v0.0.1-mc26.2`.
+`v0.0.2-mc26.2`. The release asset is:
 
-Release assets identify the loader explicitly, for example:
-
-- `SimpleVoiceChatScroll-0.0.1+mc26.2-fabric.jar`
-- `SimpleVoiceChatScroll-0.0.1+mc26.2-forge.jar`
-- `SimpleVoiceChatScroll-0.0.1+mc26.2-neoforge.jar`
+- `SimpleVoiceChatScroll-0.0.2+mc26.2-universal.jar`
 
 Update `mod_version` before publishing a new version. Pushing an explicit tag
 starting with `v` is also supported.

@@ -12,7 +12,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "ru.don4ara.voicewheel.VoiceWheel"
+      "ru.don4ara.voicewheel.VoiceWheelFabric"
     ]
   },
   "mixins": [
