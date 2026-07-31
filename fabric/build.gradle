@@ -24,18 +24,10 @@ repositories {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
     implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
     implementation "maven.modrinth:simple-voice-chat:${project.voicechat_fabric_version}"
-}
-
-sourceSets {
-    main {
-        java.srcDir rootProject.file('src/main/java')
-        java.srcDir rootProject.file('common/src/main/java')
-        resources.srcDir rootProject.file('src/main/resources')
-        resources.srcDir rootProject.file('common/src/main/resources')
-    }
 }
 
 processResources {
