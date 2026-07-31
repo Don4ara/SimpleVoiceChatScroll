@@ -3,14 +3,14 @@ plugins {
 }
 
 tasks.register('universalJar', Jar) {
-    dependsOn ':fabric:jar', ':forge:jar', ':neoforge:jar'
+    dependsOn ':fabric:remapJar', ':forge:jar', ':neoforge:jar'
 
     archiveFileName = "${project.archives_base_name}-${project.mod_version}+mc${project.minecraft_version}-universal.jar"
     destinationDirectory = layout.buildDirectory.dir('libs')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from({
-        zipTree(project(':fabric').tasks.named('jar').get().archiveFile.get().asFile)
+        zipTree(project(':fabric').tasks.named('remapJar').get().archiveFile.get().asFile)
     }) {
         exclude 'META-INF/MANIFEST.MF'
     }
@@ -27,7 +27,7 @@ tasks.register('universalJar', Jar) {
 
     manifest {
         attributes(
-                'Fabric-Mapping-Namespace': 'official',
+                'Fabric-Mapping-Namespace': 'intermediary',
                 'Fabric-Minecraft-Version': project.minecraft_version,
                 'Fabric-Loader-Version': project.fabric_loader_version,
                 'FMLModType': 'MOD'
