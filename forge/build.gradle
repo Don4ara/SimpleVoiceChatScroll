@@ -31,26 +31,16 @@ dependencies {
     implementation "maven.modrinth:simple-voice-chat:${project.voicechat_forge_version}"
 }
 
-sourceSets {
-    main {
-        java.srcDir rootProject.file('common/src/main/java')
-        resources.srcDir rootProject.file('common/src/main/resources')
-        resources.srcDir rootProject.file('src/main/resources')
-    }
-}
-
 processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version
     inputs.property "forge_major", project.forge_version.toString().split('\\.')[0]
-    exclude "fabric.mod.json", "voicewheel.mixins.json"
 
     filesMatching("META-INF/mods.toml") {
         expand(
                 "version": inputs.properties.version,
                 "minecraft_version": inputs.properties.minecraft_version,
-                "forge_major": inputs.properties.forge_major,
-                "minecraft_next_version": "26.3"
+                "forge_major": inputs.properties.forge_major
         )
     }
 }
