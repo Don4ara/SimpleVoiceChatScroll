@@ -1,64 +1,153 @@
 package ru.don4ara.voicewheel;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import de.maxhenkel.voicechat.VoicechatClient;
+import de.maxhenkel.voicechat.voice.client.ClientManager;
+import de.maxhenkel.voicechat.voice.common.PlayerState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.common.Mod;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.RenderPlayerEvent;
+import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.fml.common.Mod;
 
-@Mod(value = VoiceWheelCore.MOD_ID, dist = Dist.CLIENT)
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+@Mod(VoiceWheelNeoForge.MOD_ID)
 public final class VoiceWheelNeoForge {
+
+    public static final String MOD_ID = "voicewheel";
+    private static final long MESSAGE_DURATION_MILLIS = 3000L;
+    private static final long FADE_DURATION_MILLIS = 500L;
+    private static final double RENDER_DISTANCE_SQUARED = 64.0D * 64.0D;
+    private static final float TEXT_SCALE = 0.025F;
+    private static final int FULL_BRIGHT = 0xF000F0;
+    private static final Map<UUID, VolumeMessage> VOLUME_MESSAGES = new HashMap<>();
 
     public VoiceWheelNeoForge() {
         NeoForge.EVENT_BUS.addListener(VoiceWheelNeoForge::onMouseScroll);
-        NeoForge.EVENT_BUS.addListener(VoiceWheelNeoForge::onRenderPlayer);
+        NeoForge.EVENT_BUS.addListener(VoiceWheelNeoForge::onRenderLiving);
     }
 
     private static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
+        if (!event.isRightDown()) {
+            return;
+        }
+
         double scroll = event.getScrollDeltaY() == 0.0D
                 ? -event.getScrollDeltaX()
                 : event.getScrollDeltaY();
-        if (event.isRightDown()
-                && scroll != 0.0D
-                && VoiceWheelCore.handleScroll(scroll)) {
+        if (handleScroll(scroll)) {
             event.setCanceled(true);
         }
     }
 
-    private static void onRenderPlayer(RenderPlayerEvent.Post<?> event) {
+    private static boolean handleScroll(double scroll) {
         Minecraft client = Minecraft.getInstance();
-        AvatarRenderState state = event.getRenderState();
-        if (client.level == null
-                || !(client.level.getEntity(state.id)
-                        instanceof AbstractClientPlayer player)
-                || state.distanceToCameraSq
-                        > VoiceWheelCore.RENDER_DISTANCE_SQUARED) {
+        if (!(client.crosshairPickEntity instanceof AbstractClientPlayer target)) {
+            return false;
+        }
+
+        PlayerState state = ClientManager.getPlayerStateManager().getState(target.getUUID());
+        if (state == null) {
+            return false;
+        }
+
+        double previous = VoicechatClient.PLAYER_VOLUME_CONFIG.getVolume(state.getUuid());
+        double step = previous >= 1.0D ? 0.1D : 0.05D;
+        double volume = Mth.clamp(previous + step * scroll, 0.0D, 4.0D);
+        VoicechatClient.PLAYER_VOLUME_CONFIG.setVolume(state.getUuid(), volume);
+        VoicechatClient.PLAYER_VOLUME_CONFIG.save();
+
+        int percent = (int) Math.round(100.0D * (volume - 1.0D));
+        VOLUME_MESSAGES.put(target.getUUID(), new VolumeMessage(
+                Component.literal((percent >= 0 ? "+" + percent : String.valueOf(percent)) + "%"),
+                System.currentTimeMillis()
+        ));
+        return true;
+    }
+
+    private static void onRenderLiving(RenderLivingEvent.Post<?, ?, ?> event) {
+        Minecraft client = Minecraft.getInstance();
+        ClientLevel level = client.level;
+        if (level == null) {
+            VOLUME_MESSAGES.clear();
             return;
         }
 
         long now = System.currentTimeMillis();
-        VoiceWheelCore.removeExpiredMessages(now);
-        VoiceWheelCore.VolumeMessage message =
-                VoiceWheelCore.getMessage(player.getUUID());
-        if (message == null) {
+        VOLUME_MESSAGES.entrySet().removeIf(entry ->
+                now - entry.getValue().timestamp >= MESSAGE_DURATION_MILLIS);
+
+        if (!(event.getRenderState() instanceof AvatarRenderState state)) {
+            return;
+        }
+        if (!(level.getEntity(state.id) instanceof AbstractClientPlayer player)) {
             return;
         }
 
-        VoiceWheelCore.submitText(
+        VolumeMessage message = VOLUME_MESSAGES.get(player.getUUID());
+        if (message == null || state.distanceToCameraSq > RENDER_DISTANCE_SQUARED) {
+            return;
+        }
+
+        long elapsed = now - message.timestamp;
+        float opacity = elapsed <= MESSAGE_DURATION_MILLIS - FADE_DURATION_MILLIS
+                ? 1.0F
+                : (MESSAGE_DURATION_MILLIS - elapsed) / (float) FADE_DURATION_MILLIS;
+
+        submitText(
                 event.getPoseStack(),
                 event.getSubmitNodeCollector(),
-                client.gameRenderer.mainCamera().rotation(),
-                0.0D,
-                state.boundingBoxHeight
-                        + VoiceWheelCore.indicatorHeight(
-                                state.nameTag != null
-                        ),
-                0.0D,
-                message.text(),
-                VoiceWheelCore.opacity(message, now)
+                client.gameRenderer.getMainCamera().rotation(),
+                state.boundingBoxHeight,
+                state.nameTag != null,
+                message.text,
+                opacity
         );
+    }
+
+    private static void submitText(
+            PoseStack poses,
+            SubmitNodeCollector collector,
+            org.joml.Quaternionf cameraOrientation,
+            float playerHeight,
+            boolean nameTagVisible,
+            Component text,
+            float opacity
+    ) {
+        Minecraft client = Minecraft.getInstance();
+        poses.pushPose();
+        poses.translate(0.0D, playerHeight + (nameTagVisible ? 0.85D : 0.5D), 0.0D);
+        poses.mulPose(cameraOrientation);
+        poses.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
+
+        int textAlpha = Math.round(255.0F * opacity);
+        int backgroundAlpha = Math.round(96.0F * opacity);
+        float x = -client.font.width(text) / 2.0F;
+        collector.submitText(
+                poses,
+                x,
+                0.0F,
+                text.getVisualOrderText(),
+                false,
+                Font.DisplayMode.SEE_THROUGH,
+                FULL_BRIGHT,
+                textAlpha << 24 | 0xFFFFFF,
+                backgroundAlpha << 24,
+                0
+        );
+        poses.popPose();
+    }
+
+    private record VolumeMessage(Component text, long timestamp) {
     }
 }

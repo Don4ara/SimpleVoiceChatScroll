@@ -3,34 +3,22 @@ plugins {
 }
 
 tasks.register('universalJar', Jar) {
-    dependsOn ':fabric:jar', ':forge:jar', ':neoforge:jar'
+    dependsOn ':fabric:remapJar'
 
     archiveFileName = "${project.archives_base_name}-${project.mod_version}+mc${project.minecraft_version}-universal.jar"
     destinationDirectory = layout.buildDirectory.dir('libs')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from({
-        zipTree(project(':fabric').tasks.named('jar').get().archiveFile.get().asFile)
+        zipTree(project(':fabric').tasks.named('remapJar').get().archiveFile.get().asFile)
     }) {
         exclude 'META-INF/MANIFEST.MF'
     }
-    from({
-        zipTree(project(':forge').tasks.named('jar').get().archiveFile.get().asFile)
-    }) {
-        exclude 'META-INF/MANIFEST.MF'
-    }
-    from({
-        zipTree(project(':neoforge').tasks.named('jar').get().archiveFile.get().asFile)
-    }) {
-        exclude 'META-INF/MANIFEST.MF'
-    }
-
     manifest {
         attributes(
-                'Fabric-Mapping-Namespace': 'official',
+                'Fabric-Mapping-Namespace': 'intermediary',
                 'Fabric-Minecraft-Version': project.minecraft_version,
-                'Fabric-Loader-Version': project.fabric_loader_version,
-                'FMLModType': 'MOD'
+                'Fabric-Loader-Version': project.fabric_loader_version
         )
     }
 }
@@ -40,5 +28,5 @@ tasks.named('assemble') {
 }
 
 tasks.named('clean') {
-    dependsOn ':fabric:clean', ':forge:clean', ':neoforge:clean'
+    dependsOn ':fabric:clean'
 }
