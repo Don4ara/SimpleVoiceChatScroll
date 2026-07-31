@@ -74,23 +74,24 @@ On Windows:
 The compiled mod JAR is written to `build/libs`.
 
 Changes limited to CI configuration, documentation, or Markdown files do not
-trigger a build. To skip a build for another commit, include `[ci skip]` in its
-commit message.
+trigger the regular branch build. To skip a build for another commit, include
+`[ci skip]` in its commit message.
 
 ## Releases
 
-Every push to `main`, `fabric/<version>`, `forge/<version>`, or
-`neoforge/<version>` publishes the compiled JAR to a version-specific GitHub release.
-The current multiloader build packages the Fabric, Forge, and NeoForge entrypoints
-and metadata into one universal JAR.
+Pushes and pull requests only verify the affected branch. Publishing uses the
+`Release all Minecraft versions` workflow, which builds every `ver/<version>`
+branch and attaches all 15 JAR files to one GitHub release.
 
-Release tags combine the mod and Minecraft versions, for example
-`v0.0.2-mc26.2`. The release asset is:
+Update `mod_version` on `main`, then either run the release workflow manually
+or push a shared version tag such as `v0.0.3`. The workflow overrides the
+version in every branch build, so the version branches do not need separate
+`mod_version` edits.
 
-- `SimpleVoiceChatScroll-0.0.2+mc26.2-universal.jar`
+Each asset includes its Minecraft version, for example:
 
-Update `mod_version` before publishing a new version. Pushing an explicit tag
-starting with `v` is also supported.
+- `SimpleVoiceChatScroll-0.0.3+mc1.21.1-universal.jar`
+- `SimpleVoiceChatScroll-0.0.3+mc26.2-universal.jar`
 
 ## License
 

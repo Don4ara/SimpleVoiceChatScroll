@@ -1,0 +1,185 @@
+name: Release all Minecraft versions
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "!v*-mc*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag; defaults to v<mod_version>"
+        required: false
+        type: string
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.project.outputs.tag }}
+      version: ${{ steps.project.outputs.version }}
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Read release metadata
+        id: project
+        shell: bash
+        env:
+          REQUESTED_TAG: ${{ inputs.tag }}
+        run: |
+          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
+          test -n "$version"
+
+          tag="$REQUESTED_TAG"
+          if [[ -z "$tag" ]]; then
+            if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+              tag="${GITHUB_REF#refs/tags/}"
+            else
+              tag="v${version}"
+            fi
+          fi
+
+          if [[ "$tag" == *-mc* ]]; then
+            echo "Aggregate release tags must not contain -mc" >&2
+            exit 1
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: metadata
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        include:
+          - minecraft: "1.21.1"
+            java: "21"
+          - minecraft: "1.21.2"
+            java: "21"
+          - minecraft: "1.21.3"
+            java: "21"
+          - minecraft: "1.21.4"
+            java: "21"
+          - minecraft: "1.21.5"
+            java: "21"
+          - minecraft: "1.21.6"
+            java: "21"
+          - minecraft: "1.21.7"
+            java: "21"
+          - minecraft: "1.21.8"
+            java: "21"
+          - minecraft: "1.21.9"
+            java: "21"
+          - minecraft: "1.21.10"
+            java: "21"
+          - minecraft: "1.21.11"
+            java: "21"
+          - minecraft: "26.1"
+            java: "25"
+          - minecraft: "26.1.1"
+            java: "25"
+          - minecraft: "26.1.2"
+            java: "25"
+          - minecraft: "26.2"
+            java: "25"
+
+    steps:
+      - name: Check out Minecraft ${{ matrix.minecraft }}
+        uses: actions/checkout@v6
+        with:
+          ref: ver/${{ matrix.minecraft }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Build Minecraft ${{ matrix.minecraft }}
+        run: >-
+          ./gradlew build --no-daemon
+          -Pmod_version="${{ needs.metadata.outputs.version }}"
+
+      - name: Validate release asset
+        shell: bash
+        run: |
+          shopt -s nullglob
+          jars=(build/libs/*-universal.jar)
+          if [[ "${#jars[@]}" -ne 1 ]]; then
+            printf 'Expected one universal JAR, found %s\n' "${#jars[@]}" >&2
+            exit 1
+          fi
+
+          expected="SimpleVoiceChatScroll-${{ needs.metadata.outputs.version }}+mc${{ matrix.minecraft }}-universal.jar"
+          if [[ "$(basename "${jars[0]}")" != "$expected" ]]; then
+            printf 'Expected %s, found %s\n' "$expected" "$(basename "${jars[0]}")" >&2
+            exit 1
+          fi
+
+      - name: Upload Minecraft ${{ matrix.minecraft }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar-${{ matrix.minecraft }}
+          path: build/libs/*-universal.jar
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+
+  release:
+    needs:
+      - metadata
+      - build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all version JARs
+        uses: actions/download-artifact@v5
+        with:
+          pattern: jar-*
+          path: release
+          merge-multiple: true
+
+      - name: Validate complete release
+        shell: bash
+        run: |
+          shopt -s nullglob
+          jars=(release/*-universal.jar)
+          if [[ "${#jars[@]}" -ne 15 ]]; then
+            printf 'Expected 15 release JARs, found %s\n' "${#jars[@]}" >&2
+            exit 1
+          fi
+          printf '%s\n' "${jars[@]}"
+
+      - name: Publish combined GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.metadata.outputs.tag }}
+          target_commitish: main
+          name: SimpleVoiceChatScroll ${{ needs.metadata.outputs.version }}
+          files: release/*-universal.jar
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          overwrite_files: true
+          make_latest: true
