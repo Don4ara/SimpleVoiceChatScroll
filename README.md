@@ -5,6 +5,8 @@ lets you adjust the volume of individual
 [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) players
 without opening a menu.
 
+This branch builds the Minecraft 1.21.3 universal JAR for Fabric, Forge, NeoForge.
+
 ## Features
 
 - Adjust a player's voice volume by looking at them, holding the right mouse
@@ -85,9 +87,9 @@ The current multiloader build packages the Fabric, Forge, and NeoForge entrypoin
 and metadata into one universal JAR.
 
 Release tags combine the mod and Minecraft versions, for example
-`v0.0.2-mc26.2`. The release asset is:
+`v0.0.2-mc1.21.3`. The release asset is:
 
-- `SimpleVoiceChatScroll-0.0.2+mc26.2-universal.jar`
+- `SimpleVoiceChatScroll-0.0.2+mc1.21.3-universal.jar`
 
 Update `mod_version` before publishing a new version. Pushing an explicit tag
 starting with `v` is also supported.
