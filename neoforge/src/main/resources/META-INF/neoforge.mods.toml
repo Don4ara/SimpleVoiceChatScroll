@@ -27,6 +27,6 @@ side="CLIENT"
 [[dependencies.voicewheel]]
 modId="voicechat"
 type="required"
-versionRange="[2.6,)"
+versionRange="[1,)"
 ordering="AFTER"
 side="CLIENT"
