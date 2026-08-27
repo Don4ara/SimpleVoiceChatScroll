@@ -87,9 +87,9 @@ The current multiloader build packages the Fabric, Forge, and NeoForge entrypoin
 and metadata into one universal JAR.
 
 Release tags combine the mod and Minecraft versions, for example
-`v0.0.2-mc1.21.1`. The release asset is:
+`v0.0.3-mc1.21.1`. The release asset is:
 
-- `SimpleVoiceChatScroll-0.0.2+mc1.21.1-universal.jar`
+- `SimpleVoiceChatScroll-0.0.3+mc1.21.1-universal.jar`
 
 Update `mod_version` before publishing a new version. Pushing an explicit tag
 starting with `v` is also supported.
